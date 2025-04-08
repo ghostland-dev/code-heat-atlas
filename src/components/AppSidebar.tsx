@@ -9,7 +9,8 @@ import {
   Home, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ const AppSidebar = () => {
     { name: 'Reports', path: '/reports', icon: BarChart2 },
     { name: 'Projects', path: '/projects', icon: Code },
     { name: 'Documentation', path: '/docs', icon: FileText },
+    { name: 'Profile', path: '/profile', icon: User },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 

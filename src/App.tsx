@@ -8,6 +8,9 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
+import Projects from "./pages/Projects";
+import Documentation from "./pages/Documentation";
+import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { handleGitHubCallback, LocalAuthProvider } from "./utils/authUtils";
@@ -33,6 +36,9 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/docs" element={<Documentation />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -95,6 +95,12 @@ const UserProfile = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
+            <Link to="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link to="/dashboard">
               <User className="mr-2 h-4 w-4" />
               <span>Dashboard</span>
