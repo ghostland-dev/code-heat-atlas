@@ -11,7 +11,7 @@ import {
   AccordionItem, 
   AccordionTrigger
 } from "@/components/ui/accordion";
-import { Search, FileText, Book, Info } from 'lucide-react';
+import { Search, FileText, Book, Info, Code } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 
 const Documentation = () => {
