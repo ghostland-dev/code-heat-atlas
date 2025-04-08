@@ -12,12 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
-import { isGitHubAuthenticated, logout } from '@/utils/authUtils';
+import { isGitHubAuthenticated, logout, useLocalAuth } from '@/utils/authUtils';
 import { Link } from "react-router-dom";
 import { toast } from 'sonner';
 
 const UserProfile = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(isGitHubAuthenticated());
+  const { login, user, isLocalAuthenticated } = useLocalAuth();
   
   const handleLogout = () => {
     logout();
@@ -25,25 +26,43 @@ const UserProfile = () => {
     toast.info('Logged out successfully');
   };
   
-  const handleGithubAuth = () => {
-    // Re-use the GitHub auth from NavBar
-    const clientId = "Ov23li0znIUjOjqAVNgn";
-    const redirectUri = window.location.origin;
-    const scope = "repo,user";
-    
-    const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-    
-    // Redirect to GitHub for authentication
-    window.location.href = githubUrl;
+  const handleAuth = () => {
+    try {
+      // Try GitHub auth first
+      const clientId = "Ov23li0znIUjOjqAVNgn";
+      const redirectUri = window.location.origin;
+      const scope = "repo,user";
+      
+      fetch('https://github.com', { 
+        method: 'HEAD', 
+        mode: 'no-cors',
+        cache: 'no-cache',
+      })
+      .then(() => {
+        const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+        window.location.href = githubUrl;
+      })
+      .catch(() => {
+        // GitHub is unavailable, use local auth
+        login("demo@example.com", "DemoUser");
+        toast.success("Signed in with local credentials", {
+          description: "Using demo mode since GitHub is unavailable"
+        });
+      });
+    } catch (e) {
+      // Fallback to local auth
+      login("demo@example.com", "DemoUser");
+      toast.success("Signed in with local credentials");
+    }
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLocalAuthenticated) {
     return (
       <Button 
         variant="outline" 
         size="sm" 
         className="gap-2"
-        onClick={handleGithubAuth}
+        onClick={handleAuth}
       >
         <User className="h-4 w-4" />
         <span>Sign In</span>
@@ -51,22 +70,25 @@ const UserProfile = () => {
     );
   }
 
+  const userName = user?.name || "GitHub User";
+  const userEmail = user?.email || "user@example.com";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-            <AvatarFallback>UN</AvatarFallback>
+            <AvatarImage src={user?.avatarUrl || "https://github.com/shadcn.png"} alt={userName} />
+            <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">GitHub User</p>
+            <p className="text-sm font-medium leading-none">{userName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              {userEmail}
             </p>
           </div>
         </DropdownMenuLabel>

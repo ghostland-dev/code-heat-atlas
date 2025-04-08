@@ -10,7 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
-import { handleGitHubCallback } from "./utils/authUtils";
+import { handleGitHubCallback, LocalAuthProvider } from "./utils/authUtils";
 
 // Component to handle GitHub OAuth callback
 const GitHubCallbackHandler = () => {
@@ -45,13 +45,15 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TooltipProvider>
-          <AppRoutes />
-          <Toaster />
-          <SonnerToaster />
-        </TooltipProvider>
-      </BrowserRouter>
+      <LocalAuthProvider>
+        <BrowserRouter>
+          <TooltipProvider>
+            <AppRoutes />
+            <Toaster />
+            <SonnerToaster />
+          </TooltipProvider>
+        </BrowserRouter>
+      </LocalAuthProvider>
     </QueryClientProvider>
   );
 };

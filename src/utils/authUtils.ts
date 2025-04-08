@@ -1,5 +1,6 @@
 
 import { toast } from "sonner";
+import { useState, useEffect, createContext, useContext } from "react";
 
 // Parse query parameters from URL
 export const parseQueryParams = (queryString: string): Record<string, string> => {
@@ -13,16 +14,78 @@ export const parseQueryParams = (queryString: string): Record<string, string> =>
   return params;
 };
 
+interface User {
+  email: string;
+  name: string;
+  avatarUrl?: string;
+}
+
+interface LocalAuthContext {
+  user: User | null;
+  isLocalAuthenticated: boolean;
+  login: (email: string, name: string, avatarUrl?: string) => void;
+  logout: () => void;
+}
+
+const LocalAuthContext = createContext<LocalAuthContext>({
+  user: null,
+  isLocalAuthenticated: false,
+  login: () => {},
+  logout: () => {},
+});
+
+export const LocalAuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  
+  useEffect(() => {
+    // Check local storage for user on mount
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
+  
+  const login = (email: string, name: string, avatarUrl?: string) => {
+    const user = { email, name, avatarUrl };
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('authenticated', 'true');
+  };
+  
+  const logoutUser = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('authenticated');
+    localStorage.removeItem('github_authenticated');
+  };
+  
+  return (
+    <LocalAuthContext.Provider 
+      value={{ 
+        user, 
+        isLocalAuthenticated: Boolean(user),
+        login, 
+        logout: logoutUser 
+      }}
+    >
+      {children}
+    </LocalAuthContext.Provider>
+  );
+};
+
+export const useLocalAuth = () => useContext(LocalAuthContext);
+
 // Check if the current URL has an OAuth code from GitHub
 export const handleGitHubCallback = async (): Promise<string | null> => {
   const params = parseQueryParams(window.location.search);
   
   if (params.code) {
     try {
-      // In a production app, you would send this code to your backend
-      // The backend would exchange it for an access token using the client secret
-      // For now, we'll simulate a successful authentication
-      
       // Remove the code from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
@@ -54,5 +117,7 @@ export const isGitHubAuthenticated = (): boolean => {
 // Handle logout
 export const logout = (): void => {
   localStorage.removeItem('github_authenticated');
+  localStorage.removeItem('authenticated');
+  localStorage.removeItem('user');
   toast.info('Logged out successfully');
 };
