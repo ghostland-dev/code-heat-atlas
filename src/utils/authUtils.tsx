@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 
@@ -64,12 +65,12 @@ export const LocalAuthProvider = ({ children }: { children: ReactNode }) => {
   };
   
   return (
-    <LocalAuthContext.Provider 
-      value={{ 
-        user, 
+    <LocalAuthContext.Provider
+      value={{
+        user,
         isLocalAuthenticated: Boolean(user),
-        login, 
-        logout: logoutUser 
+        login,
+        logout: logoutUser
       }}
     >
       {children}
@@ -114,7 +115,7 @@ export const isGitHubAuthenticated = (): boolean => {
 };
 
 // Handle logout from the app
-export const logoutFromApp = (): void => {
+export const logout = (): void => {
   localStorage.removeItem('github_authenticated');
   localStorage.removeItem('authenticated');
   localStorage.removeItem('user');
