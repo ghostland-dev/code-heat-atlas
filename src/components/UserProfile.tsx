@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,12 +18,12 @@ import { toast } from 'sonner';
 
 const UserProfile = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(isGitHubAuthenticated());
-  const { login, user, isLocalAuthenticated } = useLocalAuth();
+  const { login, user, isLocalAuthenticated, logout: localLogout } = useLocalAuth();
   
   const handleLogout = () => {
     logout();
+    localLogout();
     setIsAuthenticated(false);
-    toast.info('Logged out successfully');
   };
   
   const handleAuth = () => {
