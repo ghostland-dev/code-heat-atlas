@@ -1,5 +1,11 @@
+
 import { toast } from "sonner";
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+
+// GitHub OAuth configuration
+const GITHUB_CLIENT_ID = "Ov23li0znIUjOjqAVNgn"; // In production, consider using environment variables
+const GITHUB_REDIRECT_URI = window.location.origin;
+const GITHUB_SCOPE = "repo,user";
 
 // Parse query parameters from URL
 export const parseQueryParams = (queryString: string): Record<string, string> => {
@@ -79,6 +85,30 @@ export const LocalAuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useLocalAuth = () => useContext(LocalAuthContext);
+
+// Initiate GitHub OAuth flow
+export const initiateGitHubAuth = (): void => {
+  try {
+    // Try to connect to GitHub
+    fetch('https://github.com', { 
+      method: 'HEAD',
+      mode: 'no-cors',
+      cache: 'no-cache',
+    })
+    .then(() => {
+      // If GitHub is accessible, redirect to OAuth flow
+      const githubUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=${GITHUB_SCOPE}`;
+      window.location.href = githubUrl;
+    })
+    .catch(() => {
+      // GitHub might be inaccessible, throw error to handle locally
+      throw new Error("GitHub connection failed");
+    });
+  } catch (error) {
+    console.error("GitHub authentication initialization failed:", error);
+    throw error;
+  }
+};
 
 // Check if the current URL has an OAuth code from GitHub
 export const handleGitHubCallback = async (): Promise<string | null> => {

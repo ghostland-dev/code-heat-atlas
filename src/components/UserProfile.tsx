@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
-import { isGitHubAuthenticated, logout, useLocalAuth } from '@/utils/authUtils';
+import { isGitHubAuthenticated, initiateGitHubAuth, logout, useLocalAuth } from '@/utils/authUtils';
 import { Link } from "react-router-dom";
 import { toast } from 'sonner';
 
@@ -29,30 +29,13 @@ const UserProfile = () => {
   const handleAuth = () => {
     try {
       // Try GitHub auth first
-      const clientId = "Ov23li0znIUjOjqAVNgn";
-      const redirectUri = window.location.origin;
-      const scope = "repo,user";
-      
-      fetch('https://github.com', { 
-        method: 'HEAD', 
-        mode: 'no-cors',
-        cache: 'no-cache',
-      })
-      .then(() => {
-        const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-        window.location.href = githubUrl;
-      })
-      .catch(() => {
-        // GitHub is unavailable, use local auth
-        login("demo@example.com", "DemoUser");
-        toast.success("Signed in with local credentials", {
-          description: "Using demo mode since GitHub is unavailable"
-        });
-      });
+      initiateGitHubAuth();
     } catch (e) {
       // Fallback to local auth
       login("demo@example.com", "DemoUser");
-      toast.success("Signed in with local credentials");
+      toast.success("Signed in with local credentials", {
+        description: "Using demo mode since GitHub is unavailable"
+      });
     }
   };
 

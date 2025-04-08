@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -10,7 +11,11 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Better performance in production
+      tsDecorators: true,
+      jsxImportSource: mode === 'production' ? undefined : undefined,
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -18,5 +23,33 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    // Production optimizations
+    target: 'es2015',
+    minify: 'terser',
+    cssMinify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          // Group shadcn UI components
+          shadcn: [
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-label',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+          ],
+        },
+      },
+    },
+    // Source maps in development only
+    sourcemap: mode === 'development',
   },
 }));

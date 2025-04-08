@@ -5,7 +5,7 @@ import { Github, Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import UserProfile from './UserProfile';
 import { Link } from 'react-router-dom';
-import { useLocalAuth } from '@/utils/authUtils';
+import { useLocalAuth, initiateGitHubAuth } from '@/utils/authUtils';
 import {
   Sheet,
   SheetContent,
@@ -22,35 +22,15 @@ const NavBar = () => {
     
     try {
       // Try to connect to GitHub
-      const clientId = "Ov23li0znIUjOjqAVNgn";
-      const redirectUri = window.location.origin;
-      const scope = "repo,user";
-      
-      try {
-        // Check if GitHub is accessible first
-        const response = await fetch('https://github.com', { 
-          method: 'HEAD',
-          mode: 'no-cors',
-          cache: 'no-cache',
-        });
-        
-        // If we get here, GitHub might be accessible
-        const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-        window.location.href = githubUrl;
-      } catch (e) {
-        // GitHub is likely blocked, use local auth instead
-        console.error("GitHub connection failed, using local auth instead");
-        login("demo@example.com", "DemoUser");
-        toast.success("Signed in with local credentials", {
-          description: "Using demo mode since GitHub is unavailable"
-        });
-        setIsAuthenticating(false);
-      }
+      initiateGitHubAuth();
     } catch (error) {
-      console.error("Authentication error:", error);
-      toast.error("Authentication failed", {
-        description: "There was an error connecting. Please try again or use local sign in."
+      // GitHub is likely blocked, use local auth instead
+      console.error("GitHub connection failed, using local auth instead");
+      login("demo@example.com", "DemoUser");
+      toast.success("Signed in with local credentials", {
+        description: "Using demo mode since GitHub is unavailable"
       });
+    } finally {
       setIsAuthenticating(false);
     }
   };
