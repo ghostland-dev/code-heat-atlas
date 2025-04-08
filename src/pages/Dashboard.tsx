@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, Code, GitBranch, GitCommit, GitPullRequest, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isGitHubAuthenticated } from "@/utils/authUtils";
-import { mockRepos } from "@/utils/mockData";
+import { mockRepos, Repository } from "@/utils/mockData";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
@@ -14,7 +14,7 @@ const Dashboard = () => {
   const isAuthenticated = isGitHubAuthenticated();
 
   // Get recent repositories (would fetch from GitHub API in a real app)
-  const recentRepos = mockRepos.slice(0, 3);
+  const recentRepos: Repository[] = mockRepos.slice(0, 3);
   
   return (
     <div className="container mx-auto px-4 py-6">

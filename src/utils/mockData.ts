@@ -34,16 +34,27 @@ export interface RepoMetrics {
   totalLines: number;
   languages: { [key: string]: number };
   overallHealth: number; // 0-100
+  technicalDebt: number; // Days to fix issues
+  criticalIssues: number; // Number of critical issues
 }
 
-// Sample repository data
-export const mockRepos = [
-  { id: "1", name: "frontend-app", owner: "acme-corp" },
-  { id: "2", name: "backend-api", owner: "acme-corp" },
-  { id: "3", name: "data-processing", owner: "acme-corp" }
+// Updated repo interface to include language and stars
+export interface Repository {
+  id: string;
+  name: string;
+  owner: string;
+  language: string; // Added language property
+  stars: number;   // Added stars property
+}
+
+// Sample repository data updated to match interface
+export const mockRepos: Repository[] = [
+  { id: "1", name: "frontend-app", owner: "acme-corp", language: "TypeScript", stars: 124 },
+  { id: "2", name: "backend-api", owner: "acme-corp", language: "JavaScript", stars: 87 },
+  { id: "3", name: "data-processing", owner: "acme-corp", language: "Python", stars: 56 }
 ];
 
-// Sample repository metrics
+// Sample repository metrics updated with the new properties
 export const mockRepoMetrics: RepoMetrics = {
   name: "frontend-app",
   stars: 124,
@@ -58,7 +69,9 @@ export const mockRepoMetrics: RepoMetrics = {
     CSS: 15,
     HTML: 10
   },
-  overallHealth: 78
+  overallHealth: 78,
+  technicalDebt: 24, // Added technicalDebt property
+  criticalIssues: 8  // Added criticalIssues property
 };
 
 // Sample directories with metrics

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -112,7 +111,7 @@ const Reports = () => {
                 <CardContent className="pt-6">
                   <h3 className="text-lg font-medium mb-1">Technical Debt</h3>
                   <div className="text-3xl font-bold">
-                    {mockRepoMetrics.technicalDebt || '24'} days
+                    {mockRepoMetrics.technicalDebt} days
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     Estimated time to address all issues
@@ -124,7 +123,7 @@ const Reports = () => {
                 <CardContent className="pt-6">
                   <h3 className="text-lg font-medium mb-1">Critical Issues</h3>
                   <div className="text-3xl font-bold text-red-500">
-                    {mockRepoMetrics.criticalIssues || '8'}
+                    {mockRepoMetrics.criticalIssues}
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     High-priority items needing attention
