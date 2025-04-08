@@ -20,12 +20,12 @@ const Dashboard = () => {
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1">Track and manage your codebase health</p>
         </div>
         
         <div className="mt-4 md:mt-0">
-          <Button asChild className="gap-2">
+          <Button asChild className="gap-2 transition-all duration-300 hover:scale-105">
             <Link to="/">
               <Activity className="h-4 w-4" />
               New Analysis
@@ -35,64 +35,73 @@ const Dashboard = () => {
       </div>
       
       {!isAuthenticated ? (
-        <Card className="mb-8">
+        <Card className="mb-8 overflow-hidden">
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <h3 className="text-lg font-medium mb-2">Connect your GitHub account to view your dashboard</h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
                 Link your GitHub account to track repositories and analyze your codebase.
+                Get insights into code quality, technical debt, and more.
               </p>
-              <Button>Connect GitHub</Button>
+              <Button size="lg" className="transition-all duration-300 hover:bg-primary/90">Connect GitHub</Button>
             </div>
           </CardContent>
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-muted-foreground text-sm">Repositories</p>
                     <h3 className="text-2xl font-bold">12</h3>
                   </div>
-                  <Code className="h-8 w-8 text-primary opacity-80" />
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Code className="h-8 w-8 text-primary" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-muted-foreground text-sm">Pull Requests</p>
                     <h3 className="text-2xl font-bold">24</h3>
                   </div>
-                  <GitPullRequest className="h-8 w-8 text-primary opacity-80" />
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <GitPullRequest className="h-8 w-8 text-primary" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-muted-foreground text-sm">Commits</p>
                     <h3 className="text-2xl font-bold">345</h3>
                   </div>
-                  <GitCommit className="h-8 w-8 text-primary opacity-80" />
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <GitCommit className="h-8 w-8 text-primary" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-muted-foreground text-sm">Health Score</p>
                     <h3 className="text-2xl font-bold">84/100</h3>
                   </div>
-                  <Activity className="h-8 w-8 text-primary opacity-80" />
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Activity className="h-8 w-8 text-primary" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -106,7 +115,7 @@ const Dashboard = () => {
             </TabsList>
             
             <TabsContent value="overview" className="space-y-4">
-              <Card>
+              <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
                   <CardTitle>Recent Repositories</CardTitle>
                   <CardDescription>
@@ -116,9 +125,9 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {recentRepos.map(repo => (
-                      <div key={repo.id} className="flex items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
+                      <div key={repo.id} className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0">
+                        <div className="flex flex-col mb-2 sm:mb-0">
+                          <div className="flex items-center gap-2 mb-1">
                             <GitBranch className="h-4 w-4 text-muted-foreground" />
                             <span className="font-medium">{repo.name}</span>
                             <Badge variant="outline" className="text-xs">{repo.language}</Badge>
@@ -127,10 +136,10 @@ const Dashboard = () => {
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center text-sm">
-                            <Star className="h-4 w-4 text-muted-foreground mr-1" />
+                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
                             {repo.stars}
                           </div>
-                          <Button size="sm" asChild>
+                          <Button size="sm" asChild className="transition-all duration-300 hover:scale-105">
                             <Link to={`/analyze/${repo.id}`}>
                               View Analysis
                             </Link>
@@ -144,7 +153,7 @@ const Dashboard = () => {
             </TabsContent>
             
             <TabsContent value="activity">
-              <Card>
+              <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>
@@ -172,7 +181,7 @@ const Dashboard = () => {
             </TabsContent>
             
             <TabsContent value="insights">
-              <Card>
+              <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
                   <CardTitle>Code Insights</CardTitle>
                   <CardDescription>
@@ -181,7 +190,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="bg-muted rounded-lg p-4">
+                    <div className="bg-muted rounded-lg p-4 transition-all duration-300 hover:bg-muted/70">
                       <h4 className="font-medium mb-2">Top Issues</h4>
                       <ul className="list-disc pl-5 space-y-1">
                         <li>Unused dependencies across projects</li>
@@ -191,7 +200,7 @@ const Dashboard = () => {
                       </ul>
                     </div>
                     
-                    <div className="bg-muted rounded-lg p-4">
+                    <div className="bg-muted rounded-lg p-4 transition-all duration-300 hover:bg-muted/70">
                       <h4 className="font-medium mb-2">Recommendations</h4>
                       <ul className="list-disc pl-5 space-y-1">
                         <li>Implement consistent error handling strategy</li>

@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { DirectoryMetrics, mockDirectories } from '@/utils/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 interface CodeVisualizationProps {
   isLoading?: boolean;
@@ -70,6 +71,9 @@ const CodeVisualization = ({ isLoading = false }: CodeVisualizationProps) => {
       cube.position.x = Math.cos(angle) * radius;
       cube.position.y = Math.sin(angle) * radius;
       
+      // Add hover effect
+      cube.userData = { originalScale: { x: cube.scale.x, y: cube.scale.y, z: cube.scale.z } };
+      
       // Add label
       const fontSize = 0.3;
       const nameCanvas = document.createElement('canvas');
@@ -94,10 +98,17 @@ const CodeVisualization = ({ isLoading = false }: CodeVisualizationProps) => {
       return cube;
     };
     
-    // Create cubes for each directory
+    // Animation for cube entrance
+    const cubes: THREE.Mesh[] = [];
+    
+    // Create cubes for each directory with delayed appearance
     mockDirectories.forEach((dir, index) => {
-      const cube = createHeatmapCube(dir, index, mockDirectories.length);
-      scene.add(cube);
+      setTimeout(() => {
+        const cube = createHeatmapCube(dir, index, mockDirectories.length);
+        cube.scale.set(0.01, 0.01, 0.01); // Start very small
+        scene.add(cube);
+        cubes.push(cube);
+      }, index * 200); // Stagger the appearance
     });
     
     // Create a rotation center object
@@ -116,6 +127,41 @@ const CodeVisualization = ({ isLoading = false }: CodeVisualizationProps) => {
     
     window.addEventListener('resize', handleResize);
     
+    // Raycaster for mouse interactions
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let hoveredCube: THREE.Mesh | null = null;
+    
+    const onMouseMove = (event: MouseEvent) => {
+      if (!canvasRef.current) return;
+      
+      // Calculate mouse position in normalized device coordinates
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      // Reset previously hovered cube
+      if (hoveredCube) {
+        const originalScale = hoveredCube.userData.originalScale;
+        hoveredCube.scale.lerp(new THREE.Vector3(originalScale.x, originalScale.y, originalScale.z), 0.2);
+      }
+      
+      // Find intersections
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(cubes);
+      
+      if (intersects.length > 0) {
+        hoveredCube = intersects[0].object as THREE.Mesh;
+        hoveredCube.scale.lerp(new THREE.Vector3(1.2, 1.2, 1.2), 0.2);
+        document.body.style.cursor = 'pointer';
+      } else {
+        hoveredCube = null;
+        document.body.style.cursor = 'default';
+      }
+    };
+    
+    canvasRef.current.addEventListener('mousemove', onMouseMove);
+    
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
@@ -123,6 +169,14 @@ const CodeVisualization = ({ isLoading = false }: CodeVisualizationProps) => {
       // Slow automatic rotation
       rotationCenter.rotation.y += 0.002;
       scene.rotation.y = rotationCenter.rotation.y;
+      
+      // Gradually scale cubes to full size
+      cubes.forEach(cube => {
+        if (cube !== hoveredCube) {
+          const originalScale = cube.userData.originalScale || { x: 1, y: 1, z: 1 };
+          cube.scale.lerp(new THREE.Vector3(originalScale.x, originalScale.y, originalScale.z), 0.05);
+        }
+      });
       
       renderer.render(scene, camera);
     };
@@ -132,39 +186,44 @@ const CodeVisualization = ({ isLoading = false }: CodeVisualizationProps) => {
     // Clean up
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (canvasRef.current && canvasRef.current.contains(renderer.domElement)) {
-        canvasRef.current.removeChild(renderer.domElement);
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('mousemove', onMouseMove);
+        if (canvasRef.current.contains(renderer.domElement)) {
+          canvasRef.current.removeChild(renderer.domElement);
+        }
       }
       scene.clear();
     };
   }, [isLoading]);
   
   return (
-    <Card className="w-full h-[500px] relative">
+    <Card className="w-full h-[500px] relative transition-all duration-300 hover:shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Code Complexity Heatmap</span>
           <div className="flex items-center text-xs gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-heat-low"></div>
+              <div className="w-3 h-3 rounded-full bg-[#33C3F0]"></div>
               <span>Low Risk</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-heat-medium"></div>
+              <div className="w-3 h-3 rounded-full bg-[#F97316]"></div>
               <span>Medium Risk</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-heat-high"></div>
+              <div className="w-3 h-3 rounded-full bg-[#ea384c]"></div>
               <span>High Risk</span>
             </div>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div ref={canvasRef} className="w-full h-[440px]">
+        <div ref={canvasRef} className="w-full h-[440px]" aria-label="3D visualization of code complexity">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
-              <div className="animate-pulse-glow text-primary font-medium">Analyzing repository...</div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 z-10 animate-in fade-in duration-300">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <div className="text-primary font-medium">Analyzing repository...</div>
+              <div className="text-sm text-muted-foreground mt-2">This may take a moment</div>
             </div>
           )}
         </div>
