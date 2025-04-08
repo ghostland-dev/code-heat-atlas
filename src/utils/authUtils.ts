@@ -1,6 +1,5 @@
-
 import { toast } from "sonner";
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 
 // Parse query parameters from URL
 export const parseQueryParams = (queryString: string): Record<string, string> => {
@@ -20,21 +19,21 @@ interface User {
   avatarUrl?: string;
 }
 
-interface LocalAuthContext {
+interface LocalAuthContextProps {
   user: User | null;
   isLocalAuthenticated: boolean;
   login: (email: string, name: string, avatarUrl?: string) => void;
   logout: () => void;
 }
 
-const LocalAuthContext = createContext<LocalAuthContext>({
+const LocalAuthContext = createContext<LocalAuthContextProps>({
   user: null,
   isLocalAuthenticated: false,
   login: () => {},
   logout: () => {},
 });
 
-export const LocalAuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const LocalAuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   
   useEffect(() => {
@@ -114,8 +113,8 @@ export const isGitHubAuthenticated = (): boolean => {
   return localStorage.getItem('github_authenticated') === 'true';
 };
 
-// Handle logout
-export const logout = (): void => {
+// Handle logout from the app
+export const logoutFromApp = (): void => {
   localStorage.removeItem('github_authenticated');
   localStorage.removeItem('authenticated');
   localStorage.removeItem('user');
