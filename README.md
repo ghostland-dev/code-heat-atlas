@@ -1,5 +1,7 @@
 # Code Complexity Atlas
 
+[![CI](https://github.com/ghostland-dev/code-heat-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/ghostland-dev/code-heat-atlas/actions/workflows/ci.yml)
+
 Visualise code complexity and technical-debt hotspots in 3D.
 
 ## Features
